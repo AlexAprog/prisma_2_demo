@@ -1,8 +1,8 @@
 import { initAuth0 } from '@auth0/nextjs-auth0';
 
 import getConfig from 'next/config';
-const { serverRunTimeConfig } = getConfig();
-const { auth, cookieSecret } = serverRunTimeConfig;
+const { serverRuntimeConfig } = getConfig();
+const { auth, cookieSecret } = serverRuntimeConfig;
 
 export default initAuth0({
 	...auth,
