@@ -13,10 +13,23 @@ const createFieldResolver = (modelName, parName) => ({
 export const resolvers = {
 	Feed: {
 		...createFieldResolver('feed', 'author'),
+		...createFieldResolver('feed', 'tags'),
+		...createFieldResolver('feed', 'bundles'),
 	},
+
 	Bundle: {
-		...createFieldResolver('feed', 'author'),
+		...createFieldResolver('bundle', 'author'),
+		...createFieldResolver('bundle', 'tags'),
+		...createFieldResolver('bundle', 'feeds'),
 	},
+
+	BundleTag: {
+		...createFieldResolver('bundleTag', 'bundles'),
+	},
+	FeedTag: {
+		...createFieldResolver('feedTag', 'feeds'),
+	},
+
 	Query: {
 		hello: (_, __, ___) => 'hi',
 		feed: async (parent, { data: id }, { prisma }) =>
