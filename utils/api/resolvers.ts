@@ -33,6 +33,16 @@ export const resolvers = {
 	FeedTag: {
 		...createFieldResolver('feedTag', 'feeds'),
 	},
+	SavedArticle: {
+		...createFieldResolver('savedArticle', 'feeds'),
+		...createFieldResolver('savedArticle', 'author'),
+	},
+	User: {
+		...createFieldResolver('user', 'bundles'),
+		...createFieldResolver('user', 'feeds'),
+		...createFieldResolver('user', 'feedLikes'),
+		...createFieldResolver('user', 'bundleLikes'),
+	},
 
 	Query: {
 		hello: (_, __, ___) => 'hi',
@@ -74,6 +84,24 @@ export const resolvers = {
 					},
 				},
 			}),
+		savedArticle: async (_, { data: { url } }, { prisma, user: { id: authorId } }) => {
+			const savedArticles = await prisma.savedArticle.findMany({
+				where: {
+					url,
+					authorId,
+				},
+			});
+			return savedArticles[0];
+		},
+		savedArticles: async (_, args, { prisma, user: { id: authorId } }) => {
+			const savedArticles = await prisma.savedArticle.findMany({
+				where: {
+					authorId: authorId ? authorId : null,
+				},
+			});
+			return savedArticles;
+		},
+		me: async (parent, args, { prisma, user: { id } }) => prisma.user.findUnique({ where: { id } }),
 	},
 	Mutation: {
 		createFeed: async (_, { data }, { prisma, user }) => {
@@ -89,6 +117,12 @@ export const resolvers = {
 				data: { ...data, ...author },
 			});
 			return result;
+		},
+		createSavedArticle: async (_, { data }, { prisma, user }) => {
+			const author = { author: { connect: { id: user.id } } };
+			return await prisma.savedArticle.create({
+				data: { ...data, ...author },
+			});
 		},
 		likeBundle: async (parent, { data }, { prisma, user }) => {
 			const { id, likeState } = data;
