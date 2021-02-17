@@ -1,3 +1,5 @@
+import { verifyOwnership } from './verifyOwnership';
+
 const createFieldResolver = (modelName, parName) => ({
 	[parName]: async ({ id }, args, { prisma }) => {
 		const modelResponse = await prisma[modelName].findUnique({
@@ -102,6 +104,40 @@ export const resolvers = {
 			return prisma.feed.update({
 				where: { id: id },
 				data: { likes: { [connectState]: { id: user.id } } },
+			});
+		},
+		updateFeed: async (parent, { data: { id, ...feedUpdate } }, { prisma, user }) => {
+			const feed = await prisma.feed.findUnique({
+				where: {
+					id,
+				},
+				include: {
+					author: true,
+				},
+			});
+			await verifyOwnership(feed, user);
+			return prisma.feed.update({
+				where: {
+					id,
+				},
+				data: { ...feedUpdate },
+			});
+		},
+		updateBundle: async (parent, { data: { id, ...bundleFeed } }, { prisma, user }) => {
+			const bundle = await prisma.bundle.findUnique({
+				where: {
+					id,
+				},
+				include: {
+					author: true,
+				},
+			});
+			await verifyOwnership(bundle, user);
+			return prisma.bundle.update({
+				where: {
+					id,
+				},
+				data: { ...bundleFeed },
 			});
 		},
 	},
