@@ -174,5 +174,53 @@ export const resolvers = {
 				data: { ...bundleFeed },
 			});
 		},
+		deleteBundle: async (_, { data: { id } }, { prisma, user }) => {
+			const bundle = await prisma.bundle.findUnique({
+				where: {
+					id,
+				},
+				include: {
+					author: true,
+				},
+			});
+			await verifyOwnership(bundle, user);
+			return await prisma.bundle.delete({
+				where: {
+					id,
+				},
+			});
+		},
+		deleteFeed: async (_, { data: { id } }, { prisma, user }) => {
+			const feed = await prisma.feed.findUnique({
+				where: {
+					id,
+				},
+				include: {
+					author: true,
+				},
+			});
+			await verifyOwnership(feed, user);
+			return await prisma.feed.delete({
+				where: {
+					id,
+				},
+			});
+		},
+		deleteSavedArticle: async (_, { data: { id } }, { prisma, user }) => {
+			const savedArticle = await prisma.savedArticle.findUnique({
+				where: {
+					id,
+				},
+				include: {
+					author: true,
+				},
+			});
+			await verifyOwnership(savedArticle, user);
+			return await prisma.savedArticle.delete({
+				where: {
+					id,
+				},
+			});
+		},
 	},
 };
